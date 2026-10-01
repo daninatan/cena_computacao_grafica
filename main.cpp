@@ -2,8 +2,7 @@
 #include <GL/freeglut_std.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
-#include <cstdlib> // Adicione no início do arquivo
-
+#include <cstdlib> 
 #include "ConstrutorDeCenario.h"
 
 // Proporção da janela
@@ -60,30 +59,6 @@ void Desenha(void)
     glEnable(GL_LIGHTING);
 
     construtor.desenha();
-
-    // Desenha os eixos sem iluminação
-    glDisable(GL_LIGHTING);
-
-    glLineWidth(2.0f);
-
-    glBegin(GL_LINES);
-
-        // Eixo X - vermelho
-        glColor3f(1, 0, 0);
-        glVertex3f(-10000, 0, 0);
-        glVertex3f(10000, 0, 0);
-
-        // Eixo Y - verde
-        glColor3f(0, 1, 0);
-        glVertex3f(0, -10000, 0);
-        glVertex3f(0, 1000, 0);
-
-        // Eixo Z - azul
-        glColor3f(0, 0, 1);
-        glVertex3f(0, 0, -10000);
-        glVertex3f(0, 0, 10000);
-
-    glEnd();
 
     glutSwapBuffers();
 }
@@ -165,7 +140,7 @@ void Inicializa(void)
 
 
 // --------------------------------------
-// Controles do carro
+// Controles de teclado
 // --------------------------------------
 void keyboard(unsigned char key, int, int){
     if (key == 27)
@@ -195,25 +170,22 @@ void keyboardUp(unsigned char key, int, int)
 
 void mouse(int button, int state, int x, int y){ 
     if(cameraGeral){
-        if (button == 3) {
+        if (button == 4) {
             if(fovy <= 100)fovy += 0.5f;
-        }else if (button == 4) {
+        }else if (button == 3) {
             if(fovy > 10) fovy -= 0.5f;
         }
     }else{
-        if (button == 3) {
+        if (button == 4) {
             if(fovy <= 100)fovy += 0.5f;
-        } else if (button == 4) {
+        } else if (button == 3) {
             if(fovy > 30) fovy -= 0.5f;
         }
     }
     
 }
 
-
-// --------------------------------------
-// Redimensionamento da janela
-// --------------------------------------
+//Redimensionamento da Janela
 void AlteraTamanhoJanela(int w, int h)
 {
     if (h == 0)
@@ -226,7 +198,7 @@ void AlteraTamanhoJanela(int w, int h)
     glutPostRedisplay();
 }
 
-// Mantem a animacao do ventilador em aproximadamente 60 FPS.
+// Mantem a animacao do ventilador
 void AtualizaCena(int)
 {
     construtor.atualiza(0.016f);

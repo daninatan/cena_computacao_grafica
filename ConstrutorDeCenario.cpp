@@ -150,7 +150,7 @@ class Ventilador {
                     glutSolidCube(1.0f);
                 glPopMatrix();
 
-                // Motor central.
+                // Motor e Lâmpada
                 glPushMatrix();
                     glTranslatef(0.0f, -30.0f, 0.0f);
 
@@ -167,6 +167,7 @@ class Ventilador {
                     glutSolidSphere(30.0f, 16, 16);
                     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, semEmissao);
                 glPopMatrix();
+
                 // As quatro pas giram ao redor do eixo Y.
                 glRotatef(angulo, 0.0f, 1.0f, 0.0f);
                 glColor3f(0.55f, 0.35f, 0.15f);
@@ -211,10 +212,6 @@ class CarroDaCena {
         void tecla(unsigned char tecla, bool apertada) {
             if ((tecla == 'c' || tecla == 'C') && apertada)
                 primeiraPessoa = !primeiraPessoa;
-
-            // O carro nao possui mais controle de luzes.
-            if (tecla != 'l' && tecla != 'L')
-                veiculo.tecla(tecla, apertada);
         }
 
         void atualiza(float dt) {
@@ -269,7 +266,6 @@ void ConstrutorDeCenario::desenha(){
     Mesa mesa;
     mesa.desenha();
 
-    // Centraliza a pista e a coloca sobre o tampo.
     ConstrutorDePista pista;
     glPushMatrix();
         glTranslatef(-80.0f, 170.0f, -295.0f);
