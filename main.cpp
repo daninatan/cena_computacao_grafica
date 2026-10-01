@@ -8,6 +8,7 @@
 
 // Proporção da janela
 GLfloat fAspect = 1.0f;
+GLfloat fovy = 70;
 bool cameraGeral = false;
 
 ConstrutorDeCenario construtor;
@@ -16,12 +17,11 @@ ConstrutorDeCenario construtor;
 // --------------------------------------
 // Configuração da câmera
 // --------------------------------------
-void EspecificaParametrosVisualizacao(void)
-{
+void EspecificaParametrosVisualizacao(void){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(70, fAspect, 1.0, 5000.0);
+    gluPerspective(fovy, fAspect, 1.0, 5000.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -167,14 +167,13 @@ void Inicializa(void)
 // --------------------------------------
 // Controles do carro
 // --------------------------------------
-void keyboard(unsigned char key, int, int)
-{
+void keyboard(unsigned char key, int, int){
     if (key == 27)
         std::exit(0);
 
     if (key == 'v' || key == 'V') {
         cameraGeral = !cameraGeral;
-        glutPostRedisplay();
+        EspecificaParametrosVisualizacao();
         return;
     }
 
@@ -192,6 +191,23 @@ void keyboard(unsigned char key, int, int)
 void keyboardUp(unsigned char key, int, int)
 {
     construtor.tecla(key, false);
+}
+
+void mouse(int button, int state, int x, int y){ 
+    if(cameraGeral){
+        if (button == 3) {
+            if(fovy <= 100)fovy += 0.5f;
+        }else if (button == 4) {
+            if(fovy > 10) fovy -= 0.5f;
+        }
+    }else{
+        if (button == 3) {
+            if(fovy <= 100)fovy += 0.5f;
+        } else if (button == 4) {
+            if(fovy > 30) fovy -= 0.5f;
+        }
+    }
+    
 }
 
 
@@ -243,6 +259,7 @@ int main(int argc, char** argv)
 
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboardUp);
+    glutMouseFunc(mouse);
     glutIgnoreKeyRepeat(1);
     glutTimerFunc(16, AtualizaCena, 0);
 
