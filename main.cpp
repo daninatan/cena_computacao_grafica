@@ -9,6 +9,7 @@
 // Proporção da janela
 GLfloat fAspect = 1.0f;
 bool cameraGeral = false;
+bool cameraVitrine = false;
 
 ConstrutorDeCenario construtor;
 
@@ -26,11 +27,13 @@ void EspecificaParametrosVisualizacao(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    if (cameraGeral) {
-        // Visao em perspectiva de toda a cena.
+    if (cameraVitrine) {
+        construtor.posicionaCameraVitrine();
+    } else if (cameraGeral) {
+        // Visao de toda a cena, da parede da frente para o fundo.
         gluLookAt(
-            850.0f, 700.0f, 850.0f,
-            0.0f, 200.0f, 0.0f,
+            250.0f, 620.0f, 950.0f,
+            -120.0f, 180.0f, -350.0f,
             0.0f, 1.0f, 0.0f
         );
     } else {
@@ -55,6 +58,7 @@ void Desenha(void)
     };
 
     glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz);
+    construtor.luzes();
 
     // Desenha a pista com iluminação
     glEnable(GL_LIGHTING);
@@ -158,9 +162,6 @@ void Inicializa(void)
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    glDisable(GL_LIGHT1);
-    glDisable(GL_LIGHT2);
-    glDisable(GL_LIGHT3);
 }
 
 
@@ -172,7 +173,13 @@ void keyboard(unsigned char key, int, int)
     if (key == 27)
         std::exit(0);
 
+    if (key == 'e' || key == 'E') {
+        cameraVitrine = !cameraVitrine;
+        return;
+    }
+
     if (key == 'v' || key == 'V') {
+        cameraVitrine = false;
         cameraGeral = !cameraGeral;
         glutPostRedisplay();
         return;
@@ -192,6 +199,14 @@ void keyboard(unsigned char key, int, int)
 void keyboardUp(unsigned char key, int, int)
 {
     construtor.tecla(key, false);
+}
+
+
+// Na camera da vitrine, clicar num carro troca o carro da pista por ele.
+void mouse(int botao, int estado, int x, int y)
+{
+    if (cameraVitrine && botao == GLUT_LEFT_BUTTON && estado == GLUT_DOWN)
+        construtor.cliqueNaVitrine(x, y);
 }
 
 
@@ -243,6 +258,7 @@ int main(int argc, char** argv)
 
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboardUp);
+    glutMouseFunc(mouse);
     glutIgnoreKeyRepeat(1);
     glutTimerFunc(16, AtualizaCena, 0);
 

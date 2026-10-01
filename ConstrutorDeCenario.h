@@ -9,6 +9,9 @@ class ConstrutorDeCenario{
         void tecla(unsigned char tecla, bool apertada);
         void atualiza(float dt);
         void posicionaCamera();
+        void posicionaCameraVitrine();
+        void cliqueNaVitrine(int x, int y); // x, y da glutMouseFunc
+        void luzes(); // chamar depois da camera
 };
 
 #endif

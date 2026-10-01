@@ -24,8 +24,9 @@ namespace carros {
 
 class Veiculo {
 public:
-    ModeloCarro& modelo;
+    ModeloCarro* modelo;             // ponteiro: da pra trocar o modelo com o carro andando
     float x, z, angulo;              // SRU: onde o carro está e pra onde aponta (0 = frente em +x)
+    float y = 0, inclinacao = 0;     // altura e inclinação do chão (graus, + = frente pra cima)
     float velocidade = 0;            // unidades por segundo (negativa = ré)
     EstadoCarro estado;
 
@@ -38,7 +39,7 @@ public:
                                      // (curva mais fechada), 0 = fixas como num carro comum
 
     Veiculo(ModeloCarro& modelo, float x = 0, float z = 0, float angulo = 0)
-        : modelo(modelo), x(x), z(z), angulo(angulo) {}
+        : modelo(&modelo), x(x), z(z), angulo(angulo) {}
 
     void tecla(unsigned char k, bool apertada) {
         switch (tolower(k)) {
@@ -66,7 +67,7 @@ public:
         // velocidade de giro = v * (tan(frente) - tan(trás)) / entreEixos
         float rad = PI_CARRO / 180;
         float tanFrente = tanf(estado.anguloDirecao * rad), tanTras = tanf(estado.anguloDirecaoTras * rad);
-        angulo += velocidade * (tanFrente - tanTras) / modelo.entreEixos() * dt / rad;
+        angulo += velocidade * (tanFrente - tanTras) / modelo->entreEixos() * dt / rad;
 
         // anda pra onde a frente aponta: glRotatef(angulo) leva +x para (cos, 0, -sen)
         x += cosf(angulo * rad) * velocidade * dt;
@@ -79,7 +80,7 @@ public:
     void luzes() {
         glPushMatrix();
         sru();
-        modelo.luzes(estado);
+        modelo->luzes(estado);
         glPopMatrix();
     }
 
@@ -98,13 +99,13 @@ public:
         sru();
 
         passadaDoVidro = false;                            // 1ª passada: opacos
-        modelo.desenhar(estado);
+        modelo->desenhar(estado);
 
         passadaDoVidro = true;                             // 2ª passada: vidros
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // cor final = alfa*vidro + (1-alfa)*fundo
         glDepthMask(GL_FALSE);                             // vidro não "tampa" nada no z-buffer
-        modelo.desenhar(estado);
+        modelo->desenhar(estado);
         passadaDoVidro = false;
 
         glPopMatrix();
@@ -116,8 +117,9 @@ private:
 
     // SRU do carro inteiro (leitura de baixo pra cima: gira na origem, depois translada)
     void sru() {
-        glTranslatef(x, 0, z);
+        glTranslatef(x, y, z);
         glRotatef(angulo, 0, 1, 0);
+        glRotatef(inclinacao, 0, 0, 1);   // sobe a frente (+x) na rampa
     }
 };
 
