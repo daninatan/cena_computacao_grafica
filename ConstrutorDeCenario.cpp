@@ -183,23 +183,19 @@ class Ventilador {
         }
 };
 
-class CarroAleatorio {
+class CarroDaCena {
     private:
         static constexpr float ESCALA = 8.0f;
         static constexpr float POSICAO_X = -55.0f;
         static constexpr float POSICAO_Y = 171.0f;
         static constexpr float POSICAO_Z = -295.0f;
 
+        carros::CarroSedan modelo; // declarado antes do veiculo, que guarda referencia a ele
         carros::Veiculo veiculo;
         bool primeiraPessoa = false;
 
-        static carros::ModeloCarro& sorteiaModelo() {
-            static carros::CarroSedan sedan;
-            return sedan;
-        }
-
     public:
-        CarroAleatorio() : veiculo(sorteiaModelo()) {
+        CarroDaCena() : veiculo(modelo) {
             veiculo.estado.luzesLigadas = false;
         }
 
@@ -261,8 +257,8 @@ class CarroAleatorio {
         }
 };
 
-CarroAleatorio& carroDaCena() {
-    static CarroAleatorio carro;
+CarroDaCena& carroDaCena() {
+    static CarroDaCena carro;
     return carro;
 }
 
