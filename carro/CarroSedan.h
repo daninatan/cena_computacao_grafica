@@ -41,7 +41,7 @@ public:
         bancoSRU(-1);                                         // motorista (esquerda)
         bancoSRU(+1);                                         // passageiro
         bancoTraseiroSRU();
-        volanteSRU();
+        volanteSRU(e.anguloDirecao);
         rodaSRU( ENTRE_EIXOS / 2, -0.88f, e.anguloDirecao, e.distancia);   // dianteira esquerda
         rodaSRU( ENTRE_EIXOS / 2,  0.88f, e.anguloDirecao, e.distancia);   // dianteira direita
         rodaSRU(-ENTRE_EIXOS / 2, -0.88f, e.anguloDirecaoTras, e.distancia);      // traseira esquerda
@@ -60,7 +60,7 @@ public:
     void luzes(const EstadoCarro& e) override { spotsDoCarro(e.luzesLigadas, 2.05f, -2.05f, 0.78f, 0.68f); }
 
 private:
-    void corDaPintura() { cor(0.80f, 0.10f, 0.10f); }        // vermelho
+    void corDaPintura() { cor(0.10f, 0.25f, 0.80f); }        // azul
 
     // ---------------------------------------------------------------- CHASSI
     // SRM: origem no centro da BASE do chassi.
@@ -186,21 +186,24 @@ private:
     // ---------------------------------------------------------------- VOLANTE (+ coluna de direção)
     // SRM: origem no centro do volante. O toro da GLUT nasce "olhando" para +z;
     // aqui ele é modelado olhando para o motorista (-x) e um pouco inclinado.
-    void volanteSRM() {
+    void volanteSRM(float anguloDirecao) {
         cor(0.05f, 0.05f, 0.05f);
         barra(0.14f, -0.065f, 0, 0, 0, 0.03f);                 // coluna: sai do painel até o centro
         if (passadaDoVidro) return;                            // glutSolidTorus não passa pela caixa()
         glPushMatrix();
         glRotatef(90, 0, 1, 0);                                // 2) vira de frente para o motorista
         glRotatef(25, 1, 0, 0);                                // 1) inclina o topo pra frente
+        glRotatef(-3 * anguloDirecao, 0, 0, 1);                // 0) gira no proprio eixo: 3 graus de volante por grau de roda (+ = esquerda)
         glutSolidTorus(0.025, 0.15, 8, 20);
+        caixa(-0.14f, 0.14f, -0.012f, 0.012f, -0.01f, 0.01f);  // raio horizontal: mostra o giro
+        caixa(-0.012f, 0.012f, -0.14f, 0, -0.01f, 0.01f);      // raio de baixo
         glPopMatrix();
     }
     // SRU: na frente do banco do motorista.
-    void volanteSRU() {
+    void volanteSRU(float anguloDirecao) {
         glPushMatrix();
         glTranslatef(0.50f, 1.00f, -0.40f);
-        volanteSRM();
+        volanteSRM(anguloDirecao);
         glPopMatrix();
     }
 

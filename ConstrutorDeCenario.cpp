@@ -1,23 +1,10 @@
 #include "ConstrutorDeCenario.h"
 #include "ConstrutorDePista.h"
-#include "carro/CarroCaminhao.h"
-#include "carro/CarroCaminhonete.h"
-#include "carro/CarroConversivel.h"
-#include "carro/CarroEsportivo.h"
-#include "carro/CarroFusca.h"
-#include "carro/CarroHatch.h"
-#include "carro/CarroHotRod.h"
-#include "carro/CarroJipe.h"
-#include "carro/CarroMonstro.h"
-#include "carro/CarroPerua.h"
-#include "carro/CarroSUV.h"
 #include "carro/CarroSedan.h"
-#include "carro/CarroVan.h"
 #include "carro/Veiculo.h"
 
 #include <GL/gl.h>
 #include <GL/glut.h>
-#include <random>
 
 //casa
 class Chao{
@@ -196,46 +183,19 @@ class Ventilador {
         }
 };
 
-class CarroAleatorio {
+class CarroDaCena {
     private:
         static constexpr float ESCALA = 8.0f;
         static constexpr float POSICAO_X = -55.0f;
         static constexpr float POSICAO_Y = 171.0f;
         static constexpr float POSICAO_Z = -295.0f;
 
+        carros::CarroSedan modelo; // declarado antes do veiculo, que guarda referencia a ele
         carros::Veiculo veiculo;
-
-        static carros::ModeloCarro& sorteiaModelo() {
-            static carros::CarroCaminhao caminhao;
-            static carros::CarroCaminhonete caminhonete;
-            static carros::CarroConversivel conversivel;
-            static carros::CarroEsportivo esportivo;
-            static carros::CarroFusca fusca;
-            static carros::CarroHatch hatch;
-            static carros::CarroHotRod hotRod;
-            static carros::CarroJipe jipe;
-            static carros::CarroMonstro monstro;
-            static carros::CarroPerua perua;
-            static carros::CarroSUV suv;
-            static carros::CarroSedan sedan;
-            static carros::CarroVan van;
-
-            static carros::ModeloCarro* modelos[] = {
-                &caminhao, &caminhonete, &conversivel, &esportivo,
-                &fusca, &hatch, &hotRod, &jipe, &monstro, &perua,
-                &suv, &sedan, &van
-            };
-
-            // O sorteio acontece somente na primeira vez que a cena e desenhada.
-            static std::mt19937 gerador(std::random_device{}());
-            static std::uniform_int_distribution<int> sorteio(0, 12);
-            static int escolhido = sorteio(gerador);
-
-            return *modelos[escolhido];
-        }
+        bool primeiraPessoa = false;
 
     public:
-        CarroAleatorio() : veiculo(sorteiaModelo()) {
+        CarroDaCena() : veiculo(modelo) {
             veiculo.estado.luzesLigadas = false;
         }
 
@@ -249,6 +209,9 @@ class CarroAleatorio {
         }
 
         void tecla(unsigned char tecla, bool apertada) {
+            if ((tecla == 'c' || tecla == 'C') && apertada)
+                primeiraPessoa = !primeiraPessoa;
+
             // O carro nao possui mais controle de luzes.
             if (tecla != 'l' && tecla != 'L')
                 veiculo.tecla(tecla, apertada);
@@ -265,6 +228,23 @@ class CarroAleatorio {
             float carroX = POSICAO_X + ESCALA * veiculo.x;
             float carroZ = POSICAO_Z + ESCALA * veiculo.z;
 
+            if (primeiraPessoa) {
+                // Olho do motorista no SRM do carro: cabeca encostada no banco
+                // esquerdo (encosto em x = -0.20..-0.10, topo y = 1.20), na altura
+                // do topo do volante (y = 1.15), olhando reto. Gira junto com o carro.
+                const float olhoX = -0.08f, olhoY = 1.15f, olhoZ = -0.40f;
+                float olhoMundoX = carroX + ESCALA * (olhoX * frenteX + olhoZ * sinf(rad));
+                float olhoMundoZ = carroZ + ESCALA * (olhoX * frenteZ + olhoZ * cosf(rad));
+                float olhoMundoY = POSICAO_Y + ESCALA * olhoY;
+
+                gluLookAt(
+                    olhoMundoX, olhoMundoY, olhoMundoZ,
+                    olhoMundoX + frenteX, olhoMundoY - 0.03f, olhoMundoZ + frenteZ,
+                    0.0f, 1.0f, 0.0f
+                );
+                return;
+            }
+
             gluLookAt(
                 carroX - frenteX * 90.0f,
                 POSICAO_Y + 55.0f,
@@ -277,8 +257,8 @@ class CarroAleatorio {
         }
 };
 
-CarroAleatorio& carroDaCena() {
-    static CarroAleatorio carro;
+CarroDaCena& carroDaCena() {
+    static CarroDaCena carro;
     return carro;
 }
 
